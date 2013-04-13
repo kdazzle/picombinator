@@ -32,8 +32,6 @@ def getCombinedImageStrFromPost():
     file_like = cStringIO.StringIO(request.form["image2"].decode("base64"))
     image2 = Image.open(file_like)
     
-    file_like.close()
-    
     combinedStr = interleaveImages(image1, image2)
     combinedImg = Image.fromstring("RGB", size, combinedStr)
     
@@ -43,6 +41,7 @@ def getCombinedImageStrFromPost():
     
     returnVal = output.getvalue()
     
+    file_like.close()
     output.close()
     
     return returnVal
