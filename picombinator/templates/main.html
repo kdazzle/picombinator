@@ -5,273 +5,38 @@
   </head>
   <link type="text/css" rel="stylesheet" 
     href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
-  
-  <style type="text/css">
-    h1.logo {
-        font-size:20em;
-        line-height:10%;
-    }
-    
-    img.sourceImg {
-        -webkit-box-shadow: 5px 11px 10px 3px rgba(0, 0, 0, .6);
-        box-shadow: 5px 11px 10px 3px rgba(0, 0, 0, .6);
-        width:auto;
-        height:135px;
-    }
-    
-    #imageForm input {
-        display:none;
-    }
-    
-    #dropContainer {
-        width:75%;
-        border: 2px dashed #bbb;
-        padding:5px;
-    }
-    
-    #drop_zone {
-        -moz-border-radius: 5px;
-        -webkit-border-radius: 5px;
-        border-radius: 5px;
-        padding: 25px;
-        text-align: center;
-        font: 20pt bold 'Vollkorn';
-        color: #bbb;
-    }
-    
-    #dropFileList {
-        display:none;
-        border-top: 2px dashed #bbb;
-    }
-  </style>
+  <link type="text/css" rel="stylesheet/less" href="/static/css/layout.less" />
+  <script type="text/javascript" src="/static/js/less.min.js"></script>
   
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-  <script type="text/javascript">
-    $(function() {
-        
-        $().ajaxError(function(event, jqxhr, settings, exception) {
-            console.log("You had an error!");
-            console.log(exception);
-        });
-        
-        /**
-         * @var element is a jQuery object
-        **/
-        setDraggable = function(element) {
-            element.draggable({
-                zindex: 100,
-                start: function(event, ui) {
-                    $(event.target).css("z-index", 100);
-                },
-                
-                stop: function(event, ui) {
-                    $(event.target).css("z-index", 0);
-                }
-            });
-        };
-        
-        /**
-         * @var element is a jQuery object
-        **/
-        setDroppable = function(element) {
-            element.droppable({ 
-                accept: ".sourceImg",
-                
-                over: function(event, ui) {
-                    droppableAnimate(event.target, true);
-                },
-                
-                out: function(event, ui) {
-                    droppableAnimate(event.target, false);
-                },
-                
-                drop: function(event, ui) {
-                    dropSuccessAction(event.target, ui.draggable);
-                }
-            });
-        };
-        
-        var initImage = function(imageElem) {
-            setDraggable(imageElem);
-            setDroppable(imageElem);
-            //imageElem.resizable({aspectRatio: true});
-        };
-        
-        initImage($(".sourceImg"));
-        
-        var droppableAnimate = function(target, isOver) {
-            var originalHeight = 135;
-            if (isOver === true) {
-                var newHeight = originalHeight + 20;
-            } else {
-                var newHeight = originalHeight;
-            }
-            
-            $(target).animate({height: newHeight});
-        };
-        
-        var dropSuccessAction = function(target, dragged) {
-            dragged.css("z-index", 101);
-            dragged.animate({height : 135 / 2});
-            dragged.animate({height : 135});
-            window.setTimeout(function() {dragged.css("z-index", 0);}, 100);
-            
-            //var combinedImageStr = combineImages(target, dragged);
-            
-            getCombinedImageFromServer(target, dragged);
-        };
-        
-        var combineImages = function(image1Elem, image2Elem) {
-            image1Str = $(image1Elem).attr("src").split(",")[1];
-            image2Str = $(image2Elem).attr("src").split(",")[1];
-            
-            return interleave(image1Str, image2Str);
-        }
-        
-        var interleave = function(first, second) {
-            if (first.length > second.length) {
-                var maxLength = first.length;
-            } else {
-                var maxLength = second.length;
-            }
-            
-            var composite = "";
-            for (var i=0; i < maxLength; i++) {
-                if (i < first.length) {
-                    composite += first.charAt(i);
-                } else  {
-                    composite.concat(first.charAt(i % first.length));
-                }
-                
-                if (i < second.length) {
-                    composite += second.charAt(i);
-                } else {
-                    composite.concat(second.charAt(i % second.length));
-                }
-            }
-            
-            return composite;
-        }
-        
-        var getCombinedImageFromServer = function(image1, image2) {
-            var request = $.ajax({
-                type: "POST",
-                url: "/",
-                data: {
-                    image1: $(image1).attr("src").split(",")[1],
-                    image2: $(image2).attr("src").split(",")[1]
-                },
-                success: function (data) {
-                    console.log("Success!");
-                    var imageStr = $.parseJSON(data).image;
-                    renderImage("data:image/jpeg;base64," + imageStr);
-                },
-                error: function (data) {
-                    console.log("Failure!");
-                    console.log(data);
-                },
-                enctype: "multipart/form-data",
-            });
-        };
-        
-        var createImageFromFile = function(file) {
-            console.log(file);
-            var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
-                    renderImage(e.target.result);
-                };
-            })(file);
-            
-            reader.readAsDataURL(file);
-        };
-        
-        var renderImage = function(imageSrc) {
-            var newImg = $("<img />")
-                .attr({src: imageSrc})
-                .addClass("sourceImg");
-            var container = $("#imageContainer").append(newImg);
-            initImage(newImg);
-        };
-        
-        function SourceImage() {
-            this.draggable();
-            this.droppable({ accept: ".sourceImg"});
-        };
-        
-        SourceImage.prototype = {
-            constructor: SourceImage,
-            
-            helloWorld: function() {
-                console.log("Just made a function prototype!");
-            }
-        };
-        
-        
-        
-        
-        function handleFileSelect(evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
-
-            var files = evt.dataTransfer.files; // FileList object.
-
-            // files is a FileList of File objects. List some properties.
-            var output = [];
-            for (var i = 0, f; f = files[i]; i++) {
-              output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-                          f.size, ' bytes, last modified: ',
-                          f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-                          '</li>');
-              createImageFromFile(f);
-            }
-            $("#dropFileList").css("display", "block");
-            $('#dropFileList').html('<ul>' + output.join('') + '</ul>');
-          }
-
-          function handleDragOver(evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
-            evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-          }
-
-          // Setup the dnd listeners.
-          var dropZone = document.getElementById('drop_zone');
-          dropZone.addEventListener('dragover', handleDragOver, false);
-          dropZone.addEventListener('drop', handleFileSelect, false);
-    });
-  </script>
   <body>
    
     <header>
-      <div class="container">
         <h1 class="logo">&Pi;</h1>
-      </div>
-    </header> 
-    
-    <div class="container">
-        <form id="imageForm" method="POST" enctype="multipart/form-data">
-            <input type="file" id="imageField1" name="imageField1" />
-            <input type="file" id="imageField2" name="imageField2" />
-        </form>
-    
-        <div id="imageContainer">
-            <img class="sourceImg" src="/static/img/factoryVt_thumb.jpg">
-            <img class="sourceImg" src="/static/img/factoryVt_thumb.jpg">
-        </div>
-        
         <div id="dropContainer">
-            <div id="drop_zone">Drop files here</div>
-            <output id="dropFileList"></output>
+            <div id="drop_zone">
+                <span>Drop files here</span>
+            </div>
         </div>
+    </header>
+    
+    <div id="content">
+        <div id="projectInfo">
+            <div id="secondaryLogo">
+                <span>pic</span>
+                <span>ombinator</span>
+            </div>
+            <span class="githubSpot">
+                Check it out on 
+                <a href="https://github.com/kdazzle/picombinator" target="_blank">
+                    Github
+                </a>
+            </span>
+        </div>
+        <div id="imageContainer"></div>
     </div>
     
-    
-    
-    
-    <script>
-          
-        </script>
+    <script type="text/javascript" src="/static/js/scripts.js"></script>
   </body>
 </html>

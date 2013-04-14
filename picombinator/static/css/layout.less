@@ -1,0 +1,112 @@
+body {
+    padding:0;
+    margin:0;
+    clear:both;
+    overflow:auto;
+}
+
+#dropContainer, #imageContainer {
+    width: 60%;
+}
+
+header {
+    height: 200px;
+    padding: 100px 20px 20px 20px;
+    position: absolute;
+    width: 97%;
+    
+    h1.logo {
+        font-size: 20em;
+        line-height: 0%;
+        position: relative;
+        float: left;
+        display: block;
+        width: 30%;
+        margin-top: 105px;
+    }
+    
+    #dropContainer {
+        border: 2px dashed #bbb;
+        position: relative;
+        float: left;
+        height: 100%;
+    
+        #drop_zone {
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            text-align: center;
+            font: 20pt bold 'Vollkorn';
+            color: #bbb;
+            height: 100%;
+            width:100%;
+            display: table;
+            
+            span {
+                margin:auto;
+                vertical-align:middle;
+                text-align:center;
+                display:table-cell;
+            }
+        }
+    }
+}
+
+#content {
+    position:relative;
+    display:block;
+    top:355px;
+    
+    #projectInfo {
+        position:absolute;
+        left:20px;
+        
+        #secondaryLogo {
+            span {
+                font-size:4em;
+            }
+            
+            span:first-child {
+                font-size:7em;
+            }
+        }
+
+        .githubSpot {
+            font-size: 1.8em;
+            top: 35px;
+            position: relative;
+        }
+    }
+    
+    #imageContainer {
+        position:absolute;
+        right: 11%;
+        
+        .sourceImg {
+            -webkit-box-shadow: 5px 11px 10px 3px rgba(0, 0, 0, .6);
+            box-shadow: 5px 11px 10px 3px rgba(0, 0, 0, .6);
+            width:auto;
+            height:135px;
+            margin:5px;
+            position:absolute;
+            cursor:pointer;
+        }
+        
+        .sourceImg.large {
+            height:100%;
+        }
+        
+        .imageLoad {
+            position:relative;
+            width:auto;
+            height:135px;
+            float:left;
+            margin:5px;
+        }
+    }
+}
+   
+
+#imageForm input {
+    display:none;
+}
