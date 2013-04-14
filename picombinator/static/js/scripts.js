@@ -14,10 +14,12 @@ $(function() {
     var dropSuccessAction = function(target, dragged) {
         dragged.animate({height : defaultHeight / 2});
         dragged.animate({height : defaultHeight});
-        getCombinedImageFromServer(target, dragged);
+        
+        renderCombinedImageFromServer(target, dragged);
     };
     
-    var getCombinedImageFromServer = function(image1, image2) {
+    var renderCombinedImageFromServer = function(image1, image2) {
+        var imageLoadContainer = createImageLoadContainer();
         var request = $.ajax({
             type: "POST",
             url: "/",
@@ -33,9 +35,28 @@ $(function() {
             },
             error: function (data) {
                 console.log("Failure!");
+                $(imageLoadContainer).children(".loadingGif").remove();
+                $(imageLoadContainer).html("X");
+                setTimeout(function() {
+                    $(imageLoadContainer).fadeOut(1000);
+                }, 1000);
+                
+                setTimeout(function() {
+                    $(imageLoadContainer).remove();
+                }, 3000);
             },
             enctype: "multipart/form-data",
         });
+    };
+    
+    var createImageLoadContainer = function() {
+        var imageLoadContainer = $("<div />").addClass("imageLoad");
+        var loadingGif = $("<img />")
+            .attr("src", "/static/img/loading.gif")
+            .addClass("loadingGif");
+        $(imageLoadContainer).append(loadingGif);
+        $("#imageContainer").append(imageLoadContainer);
+        return imageLoadContainer;
     };
     
     function handleFileSelect(evt) {
@@ -53,6 +74,7 @@ $(function() {
         var reader = new FileReader();
         reader.onload = (function(theFile) {
             return function(e) {
+                createImageLoadContainer();
                 new SourceImage(e.target.result, false, false);
             };
         })(file);
@@ -138,6 +160,13 @@ $(function() {
         },
         
         render: function(sourceImage) {
+            var loadingGifContainer = $("#imageContainer").find(".loadingGif")[0];
+            var imageLoadContainer = $(loadingGifContainer).parent();
+            
+            if (!imageLoadContainer) {
+                imageLoadContainer = createImageLoadContainer();
+            }
+            
             var newImg = $("<img />")
                 .attr({
                     src: sourceImage.imageSource,
@@ -146,22 +175,13 @@ $(function() {
                 })
                 .addClass("sourceImg");
             
-            var imgLoadContainer = $("<div />")
-                .addClass("imageLoad");
-                
-            imgLoadContainer.append(newImg);
+            $(imageLoadContainer).children(".loadingGif").remove();
             
-            var container = $("#imageContainer").append(imgLoadContainer);
-            
-            var imgHeight = newImg.height();
-            var imgWidth = newImg.width();
-            imgLoadContainer.height(imgHeight).width(imgWidth);
+            $(imageLoadContainer).append(newImg)
+                .height(newImg.height())
+                .width(newImg.width());
             
             return newImg;
         },
-        
-        helloWorld: function() {
-            console.log("Just made a function prototype!");
-        }
     };
 });
