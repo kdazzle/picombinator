@@ -13,18 +13,19 @@ app = Flask(__name__)
 @app.route("/", methods=["POST", "GET"])
 def index():
     if request.method == "POST":
-        combinedImageStr = getCombinedImageStrFromPost()
+        imageInfo = getCombinedImageInfo()
         return json.dumps(
             {
-                "image": combinedImageStr.encode("base64")
+                "imageSource": imageInfo["imageSource"].encode("base64"),
+                "height": imageInfo["height"],
+                "width": imageInfo["width"]
             }
         )
     else:
         return render_template("main.html")
         
-def getCombinedImageStrFromPost():
+def getCombinedImageInfo():
     print("processing...")
-    size = (1280, 960)
     
     file_like = cStringIO.StringIO(request.form["image1"].decode("base64"))
     image1 = Image.open(file_like)
@@ -33,18 +34,23 @@ def getCombinedImageStrFromPost():
     image2 = Image.open(file_like)
     
     combinedStr = interleaveImages(image1, image2)
+    
+    size = getSize(image1, image2)
     combinedImg = Image.fromstring("RGB", size, combinedStr)
     
     output = StringIO.StringIO()
     combinedImg.save(output, "JPEG")
-    print("saved combined")
     
-    returnVal = output.getvalue()
+    imageInfo = {
+        "imageSource": output.getvalue(),
+        "height": combinedImg.size[1],
+        "width": combinedImg.size[0]
+    }
     
     file_like.close()
     output.close()
     
-    return returnVal
+    return imageInfo
 
 def interleaveImages(image1, image2):
     text1 = image1.tostring()
@@ -71,6 +77,14 @@ def interleaveImages(image1, image2):
             composite += text1[i % len1]
             
     return composite
+    
+def getSize(image1, image2):
+    if image1.size[0] > image2.size[0]:
+        size = image1.size
+    else:
+        size = image2.size
+        
+    return size
     
 if __name__ == "__main__":
     app.debug = True

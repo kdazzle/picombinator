@@ -1,23 +1,19 @@
 $(function() {
-    $().ajaxError(function(event, jqxhr, settings, exception) {
-        console.log("You had an error!");
-        console.log(exception);
-    });
-    
+    var defaultHeight = 135;
+    var defaultLargeHeight = 500;
     var droppableAnimate = function(target, isOver) {
-        var originalHeight = 135;
         if (isOver === true) {
-            var newHeight = originalHeight + 20;
+            var newHeight = defaultHeight + 20;
         } else {
-            var newHeight = originalHeight;
+            var newHeight = defaultHeight;
         }
         
         $(target).animate({height: newHeight});
     };
     
     var dropSuccessAction = function(target, dragged) {
-        dragged.animate({height : 135 / 2});
-        dragged.animate({height : 135});
+        dragged.animate({height : defaultHeight / 2});
+        dragged.animate({height : defaultHeight});
         getCombinedImageFromServer(target, dragged);
     };
     
@@ -31,12 +27,12 @@ $(function() {
             },
             success: function (data) {
                 console.log("Success!");
-                var imageStr = $.parseJSON(data).image;
-                new SourceImage("data:image/jpeg;base64," + imageStr);
+                var json = $.parseJSON(data);
+                var src = "data:image/jpeg;base64," + json.imageSource;
+                var sourceImg = new SourceImage(src, json.width, json.height);
             },
             error: function (data) {
                 console.log("Failure!");
-                console.log(data);
             },
             enctype: "multipart/form-data",
         });
@@ -57,7 +53,7 @@ $(function() {
         var reader = new FileReader();
         reader.onload = (function(theFile) {
             return function(e) {
-                new SourceImage(e.target.result);
+                new SourceImage(e.target.result, false, false);
             };
         })(file);
         
@@ -75,12 +71,21 @@ $(function() {
     dropZone.addEventListener('dragover', handleDragOver, false);
     dropZone.addEventListener('drop', handleFileSelect, false);
     
-    function SourceImage(imgSrc) {
+    function SourceImage(imgSrc, width, height) {
         if (!(this instanceof SourceImage)) {
             return new SourceImage(imgSrc)
         }
         
-        this.image = this.render(imgSrc);
+        this.imageSource = imgSrc;
+        
+        if (width && height) {
+            this.width = width;
+            this.height = height;
+        } else {
+            this.height = defaultLargeHeight;
+        }
+                
+        this.image = this.render(this);
         this.setDraggable(this.image);
         this.setDroppable(this.image);
         this.setDblClick(this.image);
@@ -115,13 +120,30 @@ $(function() {
         
         setDblClick: function(element) {
             $(element).dblclick(function(e) {
-                $(e.target).addClass("large");
+                if ($(e.target).hasClass("large")) {
+                    $(e.target).animate({
+                        height: defaultHeight,
+                        width: "auto"
+                    });
+                    $(e.target).removeClass("large");
+                } else {
+                    $(e.target).addClass("large");
+                    $(e.target).animate({
+                        //height: $(e.target).attr("originalHeight"),
+                        height: defaultLargeHeight,
+                        width: "auto"
+                    });
+                }
             });
         },
         
-        render: function(imageSrc) {
+        render: function(sourceImage) {
             var newImg = $("<img />")
-                .attr({src: imageSrc})
+                .attr({
+                    src: sourceImage.imageSource,
+                    originalHeight: sourceImage.height,
+                    originalWidth: sourceImage.width
+                })
                 .addClass("sourceImg");
             
             var imgLoadContainer = $("<div />")
