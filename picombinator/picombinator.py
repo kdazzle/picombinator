@@ -33,10 +33,13 @@ def getCombinedImageInfo():
     file_like = cStringIO.StringIO(request.form["image2"].decode("base64"))
     image2 = Image.open(file_like)
     
-    combinedStr = interleaveImages(image1, image2)
+    if (image1.size == image2.size):
+        combinedImg = Image.blend(image1, image2, .5)
+    else:
+        combinedStr = interleaveImages(image1, image2)
+        size = getSize(image1, image2)
+        combinedImg = Image.fromstring("RGB", size, combinedStr)
     
-    size = getSize(image1, image2)
-    combinedImg = Image.fromstring("RGB", size, combinedStr)
     
     output = StringIO.StringIO()
     combinedImg.save(output, "JPEG")

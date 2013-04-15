@@ -35,18 +35,22 @@ $(function() {
             },
             error: function (data) {
                 console.log("Failure!");
-                $(imageLoadContainer).children(".loadingGif").remove();
-                $(imageLoadContainer).html("X");
-                setTimeout(function() {
-                    $(imageLoadContainer).fadeOut(1000);
-                }, 1000);
-                
-                setTimeout(function() {
-                    $(imageLoadContainer).remove();
-                }, 3000);
+                displayFailedImageLoad(imageLoadContainer);
             },
             enctype: "multipart/form-data",
         });
+    };
+    
+    var displayFailedImageLoad = function(imageLoadContainer) {
+        $(imageLoadContainer).children(".loadingGif").remove();
+        $(imageLoadContainer).html("X");
+        setTimeout(function() {
+            $(imageLoadContainer).fadeOut(1000);
+        }, 1000);
+        
+        setTimeout(function() {
+            $(imageLoadContainer).remove();
+        }, 3000);
     };
     
     var createImageLoadContainer = function() {
@@ -98,8 +102,6 @@ $(function() {
             return new SourceImage(imgSrc)
         }
         
-        this.imageSource = imgSrc;
-        
         if (width && height) {
             this.width = width;
             this.height = height;
@@ -107,7 +109,7 @@ $(function() {
             this.height = defaultLargeHeight;
         }
                 
-        this.image = this.render(this);
+        this.image = this.render(this, imgSrc);
         this.setDraggable(this.image);
         this.setDroppable(this.image);
         this.setDblClick(this.image);
@@ -159,7 +161,7 @@ $(function() {
             });
         },
         
-        render: function(sourceImage) {
+        render: function(sourceImage, imageSrc) {
             var loadingGifContainer = $("#imageContainer").find(".loadingGif")[0];
             var imageLoadContainer = $(loadingGifContainer).parent();
             
@@ -169,7 +171,7 @@ $(function() {
             
             var newImg = $("<img />")
                 .attr({
-                    src: sourceImage.imageSource,
+                    src: imageSrc,
                     originalHeight: sourceImage.height,
                     originalWidth: sourceImage.width
                 })
@@ -177,9 +179,12 @@ $(function() {
             
             $(imageLoadContainer).children(".loadingGif").remove();
             
-            $(imageLoadContainer).append(newImg)
-                .height(newImg.height())
-                .width(newImg.width());
+            $(imageLoadContainer).append(newImg);
+            
+            $(newImg).one("load", function() {
+                $(imageLoadContainer).height($(newImg).height());
+                $(imageLoadContainer).width($(newImg).width());
+            });
             
             return newImg;
         },

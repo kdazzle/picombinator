@@ -5,10 +5,6 @@ body {
     overflow:auto;
 }
 
-#dropContainer, #imageContainer {
-    width: 60%;
-}
-
 header {
     height: 200px;
     padding: 100px 20px 20px 20px;
@@ -26,10 +22,11 @@ header {
     }
     
     #dropContainer {
-        border: 2px dashed #bbb;
+        border: 4px dashed #bbb;
         position: relative;
         float: left;
         height: 100%;
+        width: 60%;
     
         #drop_zone {
             -moz-border-radius: 5px;
@@ -80,7 +77,8 @@ header {
     
     #imageContainer {
         position:absolute;
-        right: 11%;
+        right: 13%;
+        width:55%;
         
         .sourceImg {
             -webkit-box-shadow: 5px 11px 10px 3px rgba(0, 0, 0, .6);
@@ -96,6 +94,10 @@ header {
             height:100%;
         }
         
+        .loadingGif {
+            min-width:135px;
+        }
+        
         .imageLoad, .loadingGif {
             width:auto;
             position:relative;
@@ -104,7 +106,6 @@ header {
             margin:5px;
             font-size:5em;
             color:#bbb;
-            min-width:200px;
         }
         
         .loadingGif {
