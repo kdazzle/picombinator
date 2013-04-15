@@ -1,6 +1,92 @@
 $(function() {
     var defaultHeight = 135;
     var defaultLargeHeight = 500;
+    
+    var initPage = function() {
+        // Setup the dnd listeners.
+        setupFileDropZone();
+        setupRemoveImageDropZone();
+    };
+    
+    var setupFileDropZone = function() {
+        var dropZone = document.getElementById("addFilesDropZone");
+        dropZone.addEventListener('dragover', handleDragOver, false);
+        dropZone.addEventListener('drop', handleFileSelect, false);
+    };
+    
+    var handleDragOver = function(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+    };
+    
+    var handleFileSelect = function(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+
+        var files = evt.dataTransfer.files; // FileList object.
+        for (var i = 0, f; f = files[i]; i++) {
+            if (f.type.split("/")[0] === "image") {
+                createImageFromFile(f);
+            }
+        }
+    };
+    
+    var setupRemoveImageDropZone = function() {
+        $("#removeImagesDropZone").droppable({
+            accept: ".sourceImg",
+            over: function(event, ui) {
+                dropZoneDroppableAnimate(event.target, true);
+            },
+            
+            out: function(event, ui) {
+                dropZoneDroppableAnimate(event.target, false);
+            },
+            
+            drop: function(event, ui) {
+                ui.draggable.parent().remove();
+                dropZoneDroppableAnimate(event.target, false);
+            }
+        });
+    };
+    
+    var dropZoneDroppableAnimate = function(target, isOver) {
+        if (isOver === true) {
+            var color = "red";
+            var opacity = ".6";
+        } else {
+            var color = "white";
+            var opacity = "1";
+        }
+        
+        $(target).animate({
+            backgroundColor:color,
+            opacity:opacity
+        });
+    }
+    
+    var createImageFromFile = function(file) {
+        var reader = new FileReader();
+        reader.onload = (function(theFile) {
+            return function(e) {
+                createImageLoadContainer();
+                new SourceImage(e.target.result, false, false);
+            };
+        })(file);
+        
+        reader.readAsDataURL(file);
+    };
+    
+    var createImageLoadContainer = function() {
+        var imageLoadContainer = $("<div />").addClass("imageLoad");
+        var loadingGif = $("<img />")
+            .attr("src", "/static/img/loading.gif")
+            .addClass("loadingGif");
+        $(imageLoadContainer).append(loadingGif);
+        $("#imageContainer").append(imageLoadContainer);
+        return imageLoadContainer;
+    };
+    
     var droppableAnimate = function(target, isOver) {
         if (isOver === true) {
             var newHeight = defaultHeight + 20;
@@ -28,13 +114,11 @@ $(function() {
                 image2: $(image2).attr("src").split(",")[1]
             },
             success: function (data) {
-                console.log("Success!");
                 var json = $.parseJSON(data);
                 var src = "data:image/jpeg;base64," + json.imageSource;
                 var sourceImg = new SourceImage(src, json.width, json.height);
             },
             error: function (data) {
-                console.log("Failure!");
                 displayFailedImageLoad(imageLoadContainer);
             },
             enctype: "multipart/form-data",
@@ -52,50 +136,6 @@ $(function() {
             $(imageLoadContainer).remove();
         }, 3000);
     };
-    
-    var createImageLoadContainer = function() {
-        var imageLoadContainer = $("<div />").addClass("imageLoad");
-        var loadingGif = $("<img />")
-            .attr("src", "/static/img/loading.gif")
-            .addClass("loadingGif");
-        $(imageLoadContainer).append(loadingGif);
-        $("#imageContainer").append(imageLoadContainer);
-        return imageLoadContainer;
-    };
-    
-    function handleFileSelect(evt) {
-        evt.stopPropagation();
-        evt.preventDefault();
-
-        var files = evt.dataTransfer.files; // FileList object.
-        for (var i = 0, f; f = files[i]; i++) {
-            createImageFromFile(f);
-        }
-    }
-      
-    var createImageFromFile = function(file) {
-        console.log(file);
-        var reader = new FileReader();
-        reader.onload = (function(theFile) {
-            return function(e) {
-                createImageLoadContainer();
-                new SourceImage(e.target.result, false, false);
-            };
-        })(file);
-        
-        reader.readAsDataURL(file);
-    };
-
-    function handleDragOver(evt) {
-        evt.stopPropagation();
-        evt.preventDefault();
-        evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-    }
-
-    // Setup the dnd listeners.
-    var dropZone = document.getElementById('drop_zone');
-    dropZone.addEventListener('dragover', handleDragOver, false);
-    dropZone.addEventListener('drop', handleFileSelect, false);
     
     function SourceImage(imgSrc, width, height) {
         if (!(this instanceof SourceImage)) {
@@ -189,4 +229,6 @@ $(function() {
             return newImg;
         },
     };
+    
+    initPage();
 });

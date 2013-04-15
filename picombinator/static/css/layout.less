@@ -17,18 +17,17 @@ header {
         position: relative;
         float: left;
         display: block;
-        width: 30%;
+        width: 28%;
         margin-top: 105px;
     }
     
-    #dropContainer {
-        border: 4px dashed #bbb;
+    #deleteContainer, #dropContainer {
+        border: 4px dashed;
         position: relative;
         float: left;
         height: 100%;
-        width: 60%;
-    
-        #drop_zone {
+        
+        .drop_zone {
             -moz-border-radius: 5px;
             -webkit-border-radius: 5px;
             border-radius: 5px;
@@ -46,6 +45,17 @@ header {
                 display:table-cell;
             }
         }
+    }
+    
+    #deleteContainer {
+        width:18%;
+        border-color: red;
+        float:right;
+    }
+    
+    #dropContainer {
+        border-color:#bbb;
+        width: 44%;
     }
 }
 
