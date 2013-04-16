@@ -67,7 +67,7 @@ $(function() {
     };
     
     var setupDefaultImagesLink = function() {
-        $("#loadDefaultImagesLink").click(function() {
+        $("#loadDefaultImagesLink").bind("click", function() {
             var request = $.ajax({
                 type: "POST",
                 url: "/defaultImages",
@@ -76,24 +76,12 @@ $(function() {
                 },
                 success: function (data) {
                     var json = $.parseJSON(data);
-                    /*
-                    var imgSrc = "data:image/jpeg;base64," + json.image1;
-                    new SourceImage(imgSrc, 200, 200);
-                    
-                    imgSrc = "data:image/jpeg;base64," + json.image2;
-                    new SourceImage(imgSrc, false, false);
-                    
-                    imgSrc = "data:image/jpeg;base64," + json.image3;
-                    new SourceImage(imgSrc, false, false);
-                    */
-                      
                     var imgSrc;
                     for (var i = 0; i < json.length; i++) {
                         createImageLoadContainer();
                         imgSrc = "data:image/jpeg;base64," + json[i];
                         new SourceImage(imgSrc, false, false);
                     };
-                    
                 },
                 error: function (data) {
                     displayFailedImageLoad(imageLoadContainer);
@@ -102,6 +90,15 @@ $(function() {
             });
         });
     };
+    
+    var deleteDefaultImagesLink = function() {
+        if ($("#loadDefaultImagesLink").length > 0) {
+            $("#loadDefaultImagesLink").parent().fadeOut(1000);
+            setTimeout(function() {
+                $("#loadDefaultImagesLink").parent().remove();
+            }, 1000);
+        }
+    }
     
     var createImageFromFile = function(file) {
         var reader = new FileReader();
@@ -263,6 +260,8 @@ $(function() {
                 $(imageLoadContainer).height($(newImg).height());
                 $(imageLoadContainer).width($(newImg).width());
             });
+            
+            deleteDefaultImagesLink();
             
             return newImg;
         },
