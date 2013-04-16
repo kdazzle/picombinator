@@ -10,6 +10,8 @@ from flask import request
 
 app = Flask(__name__)
 
+IMG_DIR = os.path.realpath(os.path.join(__file__, "..", "static", "img"))
+
 @app.route("/", methods=["POST", "GET"])
 def index():
     if request.method == "POST":
@@ -23,6 +25,37 @@ def index():
         )
     else:
         return render_template("main.html")
+        
+@app.route("/defaultImages", methods=["POST"])
+def defaultImages():
+    if request.method == "POST":
+        print("getting defaults")
+        output1 = StringIO.StringIO()
+        image1 = Image.open(os.path.join(IMG_DIR, "default1.jpg"))
+        image1.save(output1, "JPEG")
+        image1 = output1.getvalue()
+        
+        output2 = StringIO.StringIO()
+        image2 = Image.open(os.path.join(IMG_DIR, "default2.jpg"))
+        image2.save(output2, "JPEG")
+        image2 = output2.getvalue()
+        
+        output3 = StringIO.StringIO()
+        image3 = Image.open(os.path.join(IMG_DIR, "default3.jpg"))
+        image3.save(output3, "JPEG")
+        image3 = output3.getvalue()
+        
+        output1.close()
+        output2.close()
+        output3.close()
+        
+        return json.dumps(
+            [
+                image1.encode("base64"),
+                image2.encode("base64"),
+                image3.encode("base64"),
+            ]
+        )
         
 def getCombinedImageInfo():
     print("processing...")

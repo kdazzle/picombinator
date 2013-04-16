@@ -6,6 +6,7 @@ $(function() {
         // Setup the dnd listeners.
         setupFileDropZone();
         setupRemoveImageDropZone();
+        setupDefaultImagesLink();
     };
     
     var setupFileDropZone = function() {
@@ -36,21 +37,21 @@ $(function() {
         $("#removeImagesDropZone").droppable({
             accept: ".sourceImg",
             over: function(event, ui) {
-                dropZoneDroppableAnimate(event.target, true);
+                deleteZoneDroppableAnimate(event.target, true);
             },
             
             out: function(event, ui) {
-                dropZoneDroppableAnimate(event.target, false);
+                deleteZoneDroppableAnimate(event.target, false);
             },
             
             drop: function(event, ui) {
-                ui.draggable.parent().remove();
-                dropZoneDroppableAnimate(event.target, false);
+                ui.draggable.remove();
+                deleteZoneDroppableAnimate(event.target, false);
             }
         });
     };
     
-    var dropZoneDroppableAnimate = function(target, isOver) {
+    var deleteZoneDroppableAnimate = function(target, isOver) {
         if (isOver === true) {
             var color = "red";
             var opacity = ".6";
@@ -63,7 +64,44 @@ $(function() {
             backgroundColor:color,
             opacity:opacity
         });
-    }
+    };
+    
+    var setupDefaultImagesLink = function() {
+        $("#loadDefaultImagesLink").click(function() {
+            var request = $.ajax({
+                type: "POST",
+                url: "/defaultImages",
+                data: {
+                    getDefaultImages: true
+                },
+                success: function (data) {
+                    var json = $.parseJSON(data);
+                    /*
+                    var imgSrc = "data:image/jpeg;base64," + json.image1;
+                    new SourceImage(imgSrc, 200, 200);
+                    
+                    imgSrc = "data:image/jpeg;base64," + json.image2;
+                    new SourceImage(imgSrc, false, false);
+                    
+                    imgSrc = "data:image/jpeg;base64," + json.image3;
+                    new SourceImage(imgSrc, false, false);
+                    */
+                      
+                    var imgSrc;
+                    for (var i = 0; i < json.length; i++) {
+                        createImageLoadContainer();
+                        imgSrc = "data:image/jpeg;base64," + json[i];
+                        new SourceImage(imgSrc, false, false);
+                    };
+                    
+                },
+                error: function (data) {
+                    displayFailedImageLoad(imageLoadContainer);
+                },
+                enctype: "multipart/form-data"
+            });
+        });
+    };
     
     var createImageFromFile = function(file) {
         var reader = new FileReader();

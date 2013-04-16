@@ -12,19 +12,23 @@
   <script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
   <body>
    
-    <header>
-        <h1 class="logo">&Pi;</h1>
-        <div id="dropContainer">
-            <div class="drop_zone" id="addFilesDropZone">
-                <span>Drop image files here</span>
+    <div id="header">
+        <div class="logo">
+            <h1>&Pi;</h1>
+        </div>
+        <div id="dropContainers">
+            <div id="dropContainer">
+                <div class="drop_zone" id="addFilesDropZone">
+                    <span>Drop image files here</span>
+                </div>
+            </div>
+            <div id="deleteContainer">
+                <div class="drop_zone" id="removeImagesDropZone">
+                    <span>Drop images here to remove them</span>
+                </div>
             </div>
         </div>
-        <div id="deleteContainer">
-            <div class="drop_zone" id="removeImagesDropZone">
-                <span>Drop images here to remove them</span>
-            </div>
-        </div>
-    </header>
+    </div>
     
     <div id="content">
         <div id="projectInfo">
@@ -32,22 +36,28 @@
                 <span>pic</span>
                 <span>ombinator</span>
             </div>
-            <span class="githubSpot">
-                Check it out on 
-                <a href="https://github.com/kdazzle/picombinator" target="_blank">
-                    Github
-                </a>
-            </span>
-        </div>
-        <div id="instructions">
-            <ol>
-                <li>Drag some images into the gray box above 
-                    or <a href="#">load</a> some default ones
-                </li>
-                <li>
-                    Combine the images by dragging one on top of another
-                </li>
-            </ol>
+            <div id="instructions">
+                <ol>
+                    <li>Drag some images into the gray box above 
+                        or 
+                        <a href="#" id="loadDefaultImagesLink">load</a> 
+                        some default ones
+                    </li>
+                    <li>
+                        Combine the images by dragging one on top of another
+                    </li>
+                    <li>
+                        If the images have the same dimensions, results are to be as expected. 
+                        Otherwise...
+                    </li>
+                    <li>
+                        Check it out on 
+                        <a href="https://github.com/kdazzle/picombinator" target="_blank">
+                            Github
+                        </a>
+                    </li>
+                </ol>
+            </div>
         </div>
         <div id="imageContainer"></div>
     </div>

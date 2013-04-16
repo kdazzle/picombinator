@@ -1,31 +1,50 @@
+html, body, div {
+    min-height:100%;
+}
+
 body {
     padding:0;
     margin:0;
     clear:both;
     overflow:auto;
+    position:absolute;
+    width:100%;
 }
 
-header {
+header, #header {
     height: 200px;
     padding: 100px 20px 20px 20px;
-    position: absolute;
+    position:relative;
     width: 97%;
     
-    h1.logo {
-        font-size: 20em;
-        line-height: 0%;
-        position: relative;
-        float: left;
-        display: block;
-        width: 28%;
-        margin-top: 105px;
+    .logo {
+        float:left;
     }
     
-    #deleteContainer, #dropContainer {
-        border: 4px dashed;
+    .logo, #dropContainers {
         position: relative;
-        float: left;
+        display:inline;
+    }
+    
+    .logo h1 {
+        font-size: 20em;
+        line-height: 0%;
+        margin-top: 105px
+    }
+    
+    #dropContainers {
+        position:relative;
+        width:70%;
+        height:100%;
+        float:right;
+        display:inline;
+    }
+    
+    #dropContainer, #deleteContainer {
+        border: 4px dashed;
         height: 100%;
+        float:left;
+        display:inline;
         
         .drop_zone {
             -moz-border-radius: 5px;
@@ -48,21 +67,21 @@ header {
     }
     
     #deleteContainer {
-        width:18%;
+        width: 25%;
         border-color: red;
-        float:right;
+        position:absolute;
+        right:0;
     }
     
     #dropContainer {
         border-color:#bbb;
-        width: 44%;
+        width: 52%;
     }
 }
 
 #content {
     position:relative;
     display:block;
-    top:355px;
     
     #projectInfo {
         position:absolute;
@@ -78,10 +97,11 @@ header {
             }
         }
 
-        .githubSpot {
+        #instructions {
             font-size: 1.8em;
-            top: 35px;
+            display: inline;
             position: relative;
+            float: left;
         }
     }
     
@@ -122,9 +142,4 @@ header {
             padding:15px;
         }
     }
-}
-   
-
-#imageForm input {
-    display:none;
 }
