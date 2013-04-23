@@ -1,4 +1,6 @@
-Web application created with Javascript and Flask. 
+Web application created with Javascript and Flask.
 
 Images are dropped into the browser window. When those images are dragged on top of one another, they are blended. If the images have the same dimensions, blending is done using the PIL library's Image.blend(), otherwise the bits are interleaved and it turns out weird. But sometimes fun.
+
+Working version seen at http://www.picombinator.com
 
